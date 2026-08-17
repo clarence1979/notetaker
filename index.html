@@ -121,8 +121,32 @@ svg{flex-shrink:0}
 
 /* ---------- layout ---------- */
 .wrap{max-width:72rem;margin:0 auto;padding:0 1rem}
-main.wrap{padding-top:2rem;padding-bottom:2rem;display:flex;flex-direction:column;gap:2rem}
-@media (max-width:640px){ main.wrap{padding-top:1rem;gap:1.25rem} }
+main.wrap{padding-top:1rem;padding-bottom:1rem;display:flex;flex-direction:column;gap:1rem}
+@media (max-width:640px){ main.wrap{padding-top:.75rem;gap:.75rem} }
+
+/* App shell: the page itself never scrolls, only the work area does, so the
+   controls stay put instead of the whole thing sliding under the header. */
+@media (min-width:768px) and (min-height:600px){
+  html,body{height:100%}
+  body{display:flex;flex-direction:column;overflow:hidden}
+  header.site{position:static;flex:0 0 auto}
+  main.wrap{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
+  .site-foot{flex:0 0 auto}
+  /* with the chrome trimmed there is height to spare, so the working card takes
+     it rather than leaving a band of empty page under the controls */
+  /* Nothing may be compressed below its content, or later cards get clipped
+     instead of the work area scrolling. */
+  main.wrap>*{flex-shrink:0}
+  /* The input card soaks up spare height when it is the only thing on screen;
+     once results appear there is no spare height and it sits at its natural size. */
+  main.wrap>.card.grow{flex:1 0 auto;min-height:0;display:flex;flex-direction:column}
+  main.wrap>.card.grow>.tabs{flex:0 0 auto}
+  main.wrap>.card.grow>.card-body{flex:1 1 auto;min-height:0;overflow-y:auto}
+  main.wrap>.card.grow>.card-body>.pane{min-height:100%}
+  [data-pane="record"] #recPanel{flex:1 1 auto;display:flex;align-items:center;justify-content:center}
+  [data-pane="record"] #recPanel .rec{width:100%}
+}
+.foot-note{font-size:.75rem;color:var(--text-subtle)}
 
 /* ---------- header ---------- */
 header.site{
@@ -134,27 +158,27 @@ html[data-theme="dark"] header.site{
   background:linear-gradient(180deg, rgb(16 23 50 / .92), rgb(11 16 38 / .82));
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:none;
 }
-.hd-inner{max-width:72rem;margin:0 auto;padding:.75rem 1rem}
+.hd-inner{max-width:72rem;margin:0 auto;padding:.5rem 1rem}
 .hd-desktop{display:flex;align-items:center;justify-content:space-between;gap:1rem}
 .hd-brand{display:flex;align-items:center;gap:1rem;min-width:0}
 html[data-theme="dark"] .hd-brand{position:relative}
 html[data-theme="dark"] .hd-brand::after{
-  content:'';position:absolute;left:5.6rem;top:.25rem;bottom:.25rem;width:1px;background:var(--divider);
+  content:'';position:absolute;left:3.9rem;top:.15rem;bottom:.15rem;width:1px;background:var(--divider);
 }
 html[data-theme="dark"] .hd-brand>div{padding-left:.75rem}
-.hd-logo{height:4.25rem;width:auto;border-radius:var(--radius-lg);transition:opacity .2s}
+.hd-logo{height:2.75rem;width:auto;border-radius:var(--radius);transition:opacity .2s}
 html[data-theme="dark"] .hd-logo,html[data-theme="dark"] .hd-m-logo{
   border:1px solid var(--border);padding:.15rem;background:rgb(8 12 30 / .6);
 }
 .hd-logo:hover{opacity:.8}
 .hd-title{
-  font-size:1.625rem;font-weight:800;line-height:1.2;margin:0;letter-spacing:-.01em;
+  font-size:1.35rem;font-weight:800;line-height:1.2;margin:0;letter-spacing:-.01em;
   background:linear-gradient(to right,var(--blue-600),var(--teal-600));
   -webkit-background-clip:text;background-clip:text;color:transparent;
 }
 html[data-theme="dark"] .hd-title{background:none;color:#eef2ff;-webkit-text-fill-color:#eef2ff}
 html[data-theme="dark"] .hd-title .lead{color:#5b8cff;-webkit-text-fill-color:#5b8cff}
-.hd-sub{font-size:.8125rem;color:var(--text-subtle);margin:.25rem 0 0}
+.hd-sub{font-size:.75rem;color:var(--text-subtle);margin:.15rem 0 0;max-width:44rem}
 .hd-sub a:hover{text-decoration:underline}
 .hd-actions{display:flex;align-items:center;gap:.75rem}
 .hd-divider{height:2rem;width:1px;background:var(--divider)}
@@ -328,6 +352,10 @@ html[data-theme="dark"] .note.blue>.row>svg{
 .note p{margin:0;font-size:.875rem;line-height:1.5}
 .note p+p{margin-top:.35rem}
 .note .t{font-weight:700;margin-bottom:.25rem}
+.note.slim{padding:.6rem .875rem}
+.note.slim .row{align-items:center}
+.note.slim p{font-size:.8125rem}
+html[data-theme="dark"] .note.slim>.row>[data-icon]{padding:.35rem;width:1rem;height:1rem}
 .note-main{flex:1;min-width:0}
 .note-cta{
   flex-shrink:0;align-self:center;display:inline-flex;align-items:center;gap:.35rem;
@@ -670,10 +698,19 @@ html[data-embedded="1"] header.site{box-shadow:none}
 html[data-embedded="1"][data-narrow="1"] header.site{position:static}
 
 /* ---------- footer ---------- */
-.disclaimer{background:var(--surface-sunken);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center}
+.foot-note{font-size:.75rem;color:var(--text-subtle)}
+.disclaimer{background:var(--surface-sunken);border-top:1px solid var(--border);padding:.4rem 1rem;text-align:center}
 .disclaimer p{font-size:.75rem;color:var(--text-muted);margin:0;line-height:1.6}
-.disclaimer .links{margin-top:.5rem;display:flex;gap:1rem;justify-content:center;align-items:center;flex-wrap:wrap}
+.disclaimer .links{margin:0;display:flex;gap:.75rem;justify-content:center;align-items:center;flex-wrap:wrap}
 .sep{color:var(--text-faint);font-size:.75rem}
+.key-summary{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-bottom:1rem}
+.key-row{display:inline-flex;align-items:center;gap:.45rem;padding:.35rem .65rem;border-radius:9999px;
+  border:1px solid var(--border-inner);background:var(--surface-inner);font-size:.75rem;max-width:100%}
+.key-row b{font-weight:700;color:var(--text)}
+.key-state{color:var(--text-subtle)}
+.key-model{font-family:var(--mono);font-size:.6875rem;color:var(--accent);
+  max-width:11rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.status-dot.warn{background:var(--amber-600)}
 .empty{text-align:center;padding:2rem 1rem;color:var(--text-subtle)}
 .center-load{min-height:60dvh;display:flex;align-items:center;justify-content:center;text-align:center}
 .kbd{font-family:var(--mono);font-size:.8125rem;background:var(--hover);border:1px solid var(--border-inner);border-radius:.25rem;padding:.1rem .35rem}
@@ -697,9 +734,7 @@ html[data-theme="dark"] code.block{background:#020617}
         </a>
         <div>
           <h1 class="hd-title"><span class="lead">AI</span> Note Taker</h1>
-          <p class="hd-sub">Transform lectures into study notes &bull;
-            <a href="https://digitalvector.com.au" target="_blank" rel="noopener noreferrer">digitalvector.com.au</a>
-          </p>
+          <p class="hd-sub" id="engineSummary">Everything runs on this device &mdash; no account, no server</p>
         </div>
       </div>
       <div class="hd-actions">
@@ -749,32 +784,11 @@ html[data-theme="dark"] code.block{background:#020617}
   <!-- ============ hosting-environment notices (iframe / file:// / private mode) ============ -->
   <div id="envNotices"></div>
 
-  <!-- ============ AI engine status ============ -->
-  <div class="card">
-    <div class="card-head">
-      <div class="row between">
-        <div class="row">
-          <div class="icon-badge purple" data-icon="sparkles"></div>
-          <div>
-            <h3>AI Engines</h3>
-            <p id="engineSummary">Everything runs on this device by default &mdash; no account, no server</p>
-          </div>
-        </div>
-        <button class="btn sm btn-ghost" data-act="settings"><span data-icon="settings"></span> Configure</button>
-      </div>
-    </div>
-    <div class="card-body hidden" id="engineWarnBody">
-      <div id="engineWarn" class="hidden"></div>
-    </div>
-  </div>
+  <!-- engine warnings only appear when something needs attention -->
+  <div id="engineWarnBody" class="hidden"><div id="engineWarn"></div></div>
 
   <!-- ============ Input method ============ -->
-  <div class="card">
-    <div class="card-head">
-      <h2>Choose Your Input Method</h2>
-      <p>Select how you'd like to create your study notes</p>
-    </div>
-
+  <div class="card grow">
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" data-tab="record" aria-selected="true"><span data-icon="mic"></span><span>Record Audio</span></button>
       <button class="tab" role="tab" data-tab="upload" aria-selected="false"><span data-icon="upload"></span><span>Upload Audio</span></button>
@@ -786,15 +800,13 @@ html[data-theme="dark"] code.block{background:#020617}
     <div class="card-body">
       <!-- RECORD -->
       <div data-pane="record" class="pane">
-        <div class="note blue">
+        <div class="note blue slim">
           <div class="row">
             <span data-icon="shield"></span>
             <div class="note-main">
-              <p class="t">Recording Consent Required</p>
-              <p>Before recording, ensure you have consent from all participants and permission from your
-                educational institution.</p>
+              <p><strong>Consent required.</strong> Get permission from participants and your institution before you record.</p>
             </div>
-            <button class="link-btn note-cta" data-act="consent">Review consent requirements <span aria-hidden="true">&rarr;</span></button>
+            <button class="link-btn note-cta" data-act="consent">Details <span aria-hidden="true">&rarr;</span></button>
           </div>
         </div>
 
@@ -928,10 +940,6 @@ html[data-theme="dark"] code.block{background:#020617}
 
   <!-- ============ Review + generate ============ -->
   <div class="card hidden" id="reviewCard">
-    <div class="card-head">
-      <h2>Review and Generate Study Notes</h2>
-      <p>Review your content and generate comprehensive study notes</p>
-    </div>
     <div class="card-body" style="display:flex;flex-direction:column;gap:1.5rem">
       <div class="btn-row center">
         <button class="btn btn-blue" data-act="generateNotes"><span data-icon="brain"></span> Generate Study Notes</button>
@@ -1017,11 +1025,13 @@ html[data-theme="dark"] code.block{background:#020617}
     <div class="row"><span data-icon="alert"></span><p id="errorText"></p></div>
   </div>
 
+</main>
+
+<footer class="site-foot">
   <div class="disclaimer">
-    <p><strong>Educational Use Disclaimer:</strong> This application is designed for educational purposes in Australian schools.
-      Users are responsible for ensuring compliance with institutional policies, obtaining appropriate consent,
-      and verifying the accuracy of AI-generated content. Always review transcriptions for important information.</p>
     <div class="links">
+      <span class="foot-note">For educational use &mdash; always check AI output before relying on it.</span>
+      <span class="sep">&bull;</span>
       <button class="link-btn" data-act="privacy">Privacy Policy</button>
       <span class="sep">&bull;</span>
       <button class="link-btn" data-act="about">About local models</button>
@@ -1037,7 +1047,7 @@ html[data-theme="dark"] code.block{background:#020617}
       </form>
     </div>
   </div>
-</main>
+</footer>
 
 <!-- ============ processing toast ============ -->
 <div class="toast hidden" id="toast" role="status" aria-live="polite">
@@ -1182,6 +1192,7 @@ html[data-theme="dark"] code.block{background:#020617}
 
       <!-- KEYS -->
       <div data-spane="keys" hidden>
+        <div id="keySummary" class="key-summary"></div>
         <div class="note amber">
           <div class="row"><span data-icon="alert"></span>
             <div><p class="t">Keys stay on this device</p>
@@ -1203,14 +1214,15 @@ html[data-theme="dark"] code.block{background:#020617}
             <div class="field">
               <label for="modelOpenai">Text model</label>
               <div class="input-row">
-                <input type="text" id="modelOpenai" list="listOpenai" spellcheck="false" placeholder="gpt-4o-mini">
-                <button class="btn sm btn-ghost" data-act="fetchOpenai">Load</button>
+                <input type="text" id="modelOpenai" list="listOpenai" spellcheck="false" placeholder="Automatic — best available">
+                <button class="btn sm btn-ghost" data-act="fetchOpenai">Recheck</button>
               </div>
               <datalist id="listOpenai"></datalist>
             </div>
             <div class="field">
               <label for="modelOpenaiAsr">Transcription model</label>
-              <input type="text" id="modelOpenaiAsr" spellcheck="false" placeholder="whisper-1">
+              <input type="text" id="modelOpenaiAsr" list="listOpenaiAsr" spellcheck="false" placeholder="Automatic — best available">
+              <datalist id="listOpenaiAsr"></datalist>
             </div>
             <div class="status-line"><span class="status-dot" id="openaiDot"></span><span id="openaiStatus">No key saved</span></div>
           </div>
@@ -1229,8 +1241,8 @@ html[data-theme="dark"] code.block{background:#020617}
             <div class="field">
               <label for="modelAnthropic">Text model</label>
               <div class="input-row">
-                <input type="text" id="modelAnthropic" list="listAnthropic" spellcheck="false" placeholder="claude-sonnet-4-5">
-                <button class="btn sm btn-ghost" data-act="fetchAnthropic">Load</button>
+                <input type="text" id="modelAnthropic" list="listAnthropic" spellcheck="false" placeholder="Automatic — best available">
+                <button class="btn sm btn-ghost" data-act="fetchAnthropic">Recheck</button>
               </div>
               <datalist id="listAnthropic"></datalist>
             </div>
@@ -1252,8 +1264,8 @@ html[data-theme="dark"] code.block{background:#020617}
             <div class="field">
               <label for="modelGemini">Text model</label>
               <div class="input-row">
-                <input type="text" id="modelGemini" list="listGemini" spellcheck="false" placeholder="gemini-2.0-flash">
-                <button class="btn sm btn-ghost" data-act="fetchGemini">Load</button>
+                <input type="text" id="modelGemini" list="listGemini" spellcheck="false" placeholder="Automatic — best available">
+                <button class="btn sm btn-ghost" data-act="fetchGemini">Recheck</button>
               </div>
               <datalist id="listGemini"></datalist>
             </div>
@@ -1749,8 +1761,8 @@ const DEFAULT_SETTINGS = {
   llmEngine:'auto',
   ollamaUrl:'http://localhost:11434', ollamaModel:'', webllmModel:'',
   keyOpenai:'', keyAnthropic:'', keyGemini:'',
-  modelOpenai:'gpt-4o-mini', modelOpenaiAsr:'whisper-1',
-  modelAnthropic:'claude-sonnet-4-5', modelGemini:'gemini-2.0-flash',
+  modelOpenai:'', modelOpenaiAsr:'',
+  modelAnthropic:'', modelGemini:'',
   device:'auto', maxChunk:5,
   cdnTransformers:'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1',
   cdnWebllm:'https://esm.run/@mlc-ai/web-llm',
@@ -1761,6 +1773,12 @@ function loadSettings(){
   try{
     const raw = LSX.getItem(LS.SETTINGS);
     if(raw) settings = Object.assign({}, DEFAULT_SETTINGS, JSON.parse(raw));
+    // Older builds shipped hardcoded model names. Those go stale, so anything
+    // still matching a former default is treated as "choose automatically".
+    const STALE = ['gpt-4o-mini','whisper-1','claude-sonnet-4-5','gemini-2.0-flash','gemini-1.5-flash'];
+    ['modelOpenai','modelOpenaiAsr','modelAnthropic','modelGemini'].forEach(function(k){
+      if(STALE.indexOf(String(settings[k]||'').trim()) >= 0) settings[k] = '';
+    });
   }catch(e){ settings = Object.assign({}, DEFAULT_SETTINGS); }
 }
 function saveSettingsToStorage(){
@@ -2832,7 +2850,7 @@ async function transcribeOpenAI(pcm, onStage){
   if(!settings.keyOpenai) throw new Error('Add an OpenAI API key in Settings, or switch the transcription engine back to Local Whisper.');
   const segs = segmentPcm(pcm, 10);
   const parts = []; let lang = 'unknown';
-  const model = settings.modelOpenaiAsr || 'whisper-1';
+  const model = providerAsrModel('openai') || 'whisper-1';
   for(let i=0;i<segs.length;i++){
     if(app.cancelled) throw new Error('Cancelled');
     onStage(segs.length>1 ? ('Uploading part '+(i+1)+' of '+segs.length+'…') : 'Transcribing with OpenAI…',
@@ -2861,7 +2879,7 @@ async function transcribeGemini(pcm, onStage){
   if(!settings.keyGemini) throw new Error('Add a Google Gemini API key in Settings, or switch the transcription engine back to Local Whisper.');
   const segs = segmentPcm(pcm, 7);
   const parts = [];
-  const model = settings.modelGemini || 'gemini-2.0-flash';
+  const model = providerModel('gemini') || 'gemini-2.0-flash';
   for(let i=0;i<segs.length;i++){
     if(app.cancelled) throw new Error('Cancelled');
     onStage(segs.length>1 ? ('Uploading part '+(i+1)+' of '+segs.length+'…') : 'Transcribing with Gemini…',
@@ -3145,7 +3163,7 @@ async function readApiError(r, who){
 async function openaiChat(system, user, opts, onDelta){
   const key = settings.keyOpenai;
   if(!key) throw new Error('Add an OpenAI API key in Settings first.');
-  const model = opts.model || settings.modelOpenai || 'gpt-4o-mini';
+  const model = opts.model || providerModel('openai') || 'gpt-4o-mini';
   async function attempt(body){
     return await fetch('https://api.openai.com/v1/chat/completions', {
       method:'POST',
@@ -3181,7 +3199,7 @@ async function openaiChat(system, user, opts, onDelta){
 async function anthropicChat(system, user, opts, onDelta){
   const key = settings.keyAnthropic;
   if(!key) throw new Error('Add a Claude API key in Settings first.');
-  const model = opts.model || settings.modelAnthropic || 'claude-sonnet-4-5';
+  const model = opts.model || providerModel('anthropic') || 'claude-sonnet-4-5';
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method:'POST',
     headers:{
@@ -3211,7 +3229,7 @@ function geminiText(j){
 async function geminiChat(system, user, opts, onDelta){
   const key = settings.keyGemini;
   if(!key) throw new Error('Add a Gemini API key in Settings first.');
-  const model = opts.model || settings.modelGemini || 'gemini-2.0-flash';
+  const model = opts.model || providerModel('gemini') || 'gemini-2.0-flash';
   const url = 'https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(model)+
               ':streamGenerateContent?alt=sse&key='+encodeURIComponent(key);
   const r = await fetch(url, {
@@ -3257,34 +3275,146 @@ async function readSSE(r, extract, onDelta){
   return text;
 }
 
-/* ------------------------------ model list fetchers ------------------------------ */
-async function fetchOpenAIModels(){
-  const r = await fetch('https://api.openai.com/v1/models', { headers:{ 'Authorization':'Bearer '+settings.keyOpenai }});
-  if(!r.ok) throw new Error(await readApiError(r, 'OpenAI'));
-  const j = await r.json();
-  return (j.data||[]).map(function(m){ return m.id; })
-    .filter(function(id){ return !/embedding|tts|whisper|transcribe|image|audio|moderation|realtime|dall/i.test(id); })
-    .sort();
+/* ------------------------------ provider catalogue ------------------------------
+   Model names churn faster than any hardcoded default survives, so when a key is
+   present the list is fetched from the provider itself and ranked for what this
+   app actually does: writing study notes from a long transcript, and (OpenAI and
+   Gemini only) transcribing audio. The fetch doubles as the key check. */
+const PROVIDERS = {
+  openai:    { label:'OpenAI', keyField:'keyOpenai',    modelField:'modelOpenai',    asrField:'modelOpenaiAsr' },
+  anthropic: { label:'Claude', keyField:'keyAnthropic', modelField:'modelAnthropic', asrField:'' },
+  gemini:    { label:'Gemini', keyField:'keyGemini',    modelField:'modelGemini',    asrField:'' }
+};
+const providerState = {
+  openai:    { status:'none', chat:[], asr:[], pick:'', asrPick:'', error:'', at:0 },
+  anthropic: { status:'none', chat:[], asr:[], pick:'', asrPick:'', error:'', at:0 },
+  gemini:    { status:'none', chat:[], asr:[], pick:'', asrPick:'', error:'', at:0 }
+};
+
+/** Higher is better for turning a lecture transcript into study notes. */
+function scoreChatModel(provider, id){
+  const s = id.toLowerCase();
+  let score = 0;
+  // things that cost more or behave oddly for plain summarisation
+  if(/preview|-exp|experimental|latest-?preview/.test(s)) score -= 30;
+  if(/audio|realtime|search|image|vision-only|tts|embed|moderation/.test(s)) return -1000;
+  if(/nano|-8b|lite/.test(s)) score -= 12;      // usually too weak for structured notes
+  if(/think|reasoning|^o\d/.test(s)) score -= 20; // slow and pricey for this job
+  // version number carries most of the signal, whatever the family is called
+  const ver = s.match(/(\d+(?:[.-]\d+)?)/);
+  if(ver) score += Math.min(parseFloat(String(ver[1]).replace('-', '.')) || 0, 12) * 8;
+  if(provider === 'openai'){
+    if(/^gpt-/.test(s)) score += 40;
+    if(/mini/.test(s)) score += 8;              // ample for summarising, much cheaper
+    if(/chatgpt/.test(s)) score -= 10;
+  } else if(provider === 'anthropic'){
+    if(/sonnet/.test(s)) score += 45;           // the balance point for this task
+    else if(/haiku/.test(s)) score += 30;
+    else if(/opus/.test(s)) score += 22;        // capable but slow and dear for notes
+    const d = s.match(/(\d{8})$/);              // dated snapshots are the stable ones
+    if(d) score += 6;
+  } else if(provider === 'gemini'){
+    if(/flash/.test(s)) score += 40;
+    if(/pro/.test(s)) score += 26;
+    if(/flash-?lite/.test(s)) score -= 8;
+  }
+  return score;
 }
-async function fetchAnthropicModels(){
-  const r = await fetch('https://api.anthropic.com/v1/models?limit=100', {
-    headers:{ 'x-api-key': settings.keyAnthropic, 'anthropic-version':'2023-06-01',
-              'anthropic-dangerous-direct-browser-access':'true' }
-  });
-  if(!r.ok) throw new Error(await readApiError(r, 'Claude'));
-  const j = await r.json();
-  return (j.data||[]).map(function(m){ return m.id; }).sort();
+function scoreAsrModel(provider, id){
+  const s = id.toLowerCase();
+  let score = 0;
+  if(/transcribe/.test(s)) score += 40;         // newer and more accurate than whisper-1
+  if(/whisper/.test(s)) score += 20;
+  if(/mini/.test(s)) score += 5;
+  if(/diariz|translate/.test(s)) score -= 15;
+  return score;
 }
-async function fetchGeminiModels(){
+function rankModels(provider, ids, kind){
+  const scorer = kind === 'asr' ? scoreAsrModel : scoreChatModel;
+  return ids.map(function(id){ return { id:id, s:scorer(provider, id) }; })
+    .filter(function(m){ return m.s > -500; })
+    .sort(function(a,b){ return b.s - a.s || (a.id < b.id ? -1 : 1); })
+    .map(function(m){ return m.id; });
+}
+
+async function fetchProviderCatalogue(provider){
+  if(provider === 'openai'){
+    const r = await fetch('https://api.openai.com/v1/models', { headers:{ 'Authorization':'Bearer '+settings.keyOpenai }});
+    if(!r.ok) throw new Error(await readApiError(r, 'OpenAI'));
+    const all = ((await r.json()).data || []).map(function(m){ return m.id; });
+    return {
+      chat: all.filter(function(id){ return /^(gpt|chatgpt|o\d)/i.test(id) && !/whisper|transcribe|tts|embed|image|dall|moderation/i.test(id); }),
+      asr:  all.filter(function(id){ return /whisper|transcribe/i.test(id); })
+    };
+  }
+  if(provider === 'anthropic'){
+    const r = await fetch('https://api.anthropic.com/v1/models?limit=100', {
+      headers:{ 'x-api-key': settings.keyAnthropic, 'anthropic-version':'2023-06-01',
+                'anthropic-dangerous-direct-browser-access':'true' }});
+    if(!r.ok) throw new Error(await readApiError(r, 'Claude'));
+    return { chat: ((await r.json()).data || []).map(function(m){ return m.id; }), asr: [] };
+  }
   const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models?key='+encodeURIComponent(settings.keyGemini));
   if(!r.ok) throw new Error(await readApiError(r, 'Gemini'));
-  const j = await r.json();
-  return (j.models||[])
+  const models = ((await r.json()).models || [])
     .filter(function(m){ return (m.supportedGenerationMethods||[]).indexOf('generateContent') >= 0; })
     .map(function(m){ return String(m.name||'').replace(/^models\//,''); })
-    .filter(function(id){ return !/embedding|aqa|imagen|veo/i.test(id); })
-    .sort();
+    .filter(function(id){ return !/embedding|aqa|imagen|veo/i.test(id); });
+  // Gemini transcribes through the same multimodal endpoint
+  return { chat: models, asr: models.filter(function(id){ return /flash|pro/i.test(id); }) };
 }
+
+/** Refresh one provider. Returns the state object; never throws. */
+async function refreshProvider(provider){
+  const st = providerState[provider];
+  const key = settings[PROVIDERS[provider].keyField];
+  if(!key){ st.status='none'; st.chat=[]; st.asr=[]; st.pick=''; st.asrPick=''; st.error=''; return st; }
+  st.status = 'checking'; st.error = '';
+  try{
+    const cat = await fetchProviderCatalogue(provider);
+    st.chat = rankModels(provider, cat.chat, 'chat');
+    st.asr  = rankModels(provider, cat.asr, 'asr');
+    st.pick = st.chat[0] || '';
+    st.asrPick = st.asr[0] || '';
+    st.status = st.chat.length ? 'ok' : 'empty';
+    st.at = Date.now();
+  }catch(e){
+    st.status = /401|403|invalid|unauthor|api key/i.test(String(e.message)) ? 'invalid' : 'error';
+    st.error = String(e.message || e);
+    st.chat = []; st.asr = []; st.pick = ''; st.asrPick = '';
+  }
+  return st;
+}
+
+/** Check every provider that has a key. Runs in the background on load. */
+async function refreshProviders(onEach){
+  const ids = Object.keys(PROVIDERS).filter(function(p){ return !!settings[PROVIDERS[p].keyField]; });
+  Object.keys(PROVIDERS).forEach(function(p){
+    if(ids.indexOf(p) < 0){ const s = providerState[p]; s.status='none'; s.chat=[]; s.asr=[]; s.pick=''; s.error=''; }
+  });
+  if(onEach) onEach();
+  await Promise.all(ids.map(async function(p){
+    await refreshProvider(p);
+    if(onEach) onEach();
+  }));
+  return providerState;
+}
+
+/** The model to actually call: the user's pin if set, else whatever was discovered. */
+function providerModel(provider){
+  const meta = PROVIDERS[provider];
+  const pinned = (settings[meta.modelField] || '').trim();
+  if(pinned) return pinned;
+  return providerState[provider].pick || '';
+}
+function providerAsrModel(provider){
+  const meta = PROVIDERS[provider];
+  const pinned = meta.asrField ? (settings[meta.asrField] || '').trim() : '';
+  if(pinned) return pinned;
+  return providerState[provider].asrPick || '';
+}
+
+/* ------------------------------ model list fetchers ------------------------------ */
 
 /* ------------------------------ engine resolution ------------------------------ */
 const engineState = { llm:'', llmModel:'', ollamaAvailable:null, checked:false };
@@ -3297,9 +3427,9 @@ async function resolveLlmEngine(force){
       engineState.llmModel = settings.ollamaModel || pickOllamaModel(list||[]);
     } else if(settings.llmEngine === 'webllm'){
       engineState.llmModel = settings.webllmModel || '(auto)';
-    } else if(settings.llmEngine === 'openai'){ engineState.llmModel = settings.modelOpenai; }
-    else if(settings.llmEngine === 'anthropic'){ engineState.llmModel = settings.modelAnthropic; }
-    else if(settings.llmEngine === 'gemini'){ engineState.llmModel = settings.modelGemini; }
+    } else if(settings.llmEngine === 'openai'){ engineState.llmModel = providerModel('openai'); }
+    else if(settings.llmEngine === 'anthropic'){ engineState.llmModel = providerModel('anthropic'); }
+    else if(settings.llmEngine === 'gemini'){ engineState.llmModel = providerModel('gemini'); }
     else { engineState.llmModel = ''; }
     engineState.checked = true;
     return engineState.llm;
@@ -3314,10 +3444,21 @@ async function resolveLlmEngine(force){
   } else if(caps.webgpu){
     engineState.llm = 'webllm';
     engineState.llmModel = settings.webllmModel || '(auto)';
-  } else if(settings.keyOpenai){ engineState.llm='openai'; engineState.llmModel=settings.modelOpenai; }
-  else if(settings.keyAnthropic){ engineState.llm='anthropic'; engineState.llmModel=settings.modelAnthropic; }
-  else if(settings.keyGemini){ engineState.llm='gemini'; engineState.llmModel=settings.modelGemini; }
-  else { engineState.llm='none'; engineState.llmModel=''; }
+  } else {
+    // Skip a provider whose key was rejected or whose endpoint is unreachable —
+    // picking it would only fail again at generation time.
+    const order = ['openai','anthropic','gemini'];
+    const usable = order.filter(function(p){
+      return settings[PROVIDERS[p].keyField] && providerState[p].status === 'ok';
+    });
+    const unverified = order.filter(function(p){
+      const st = providerState[p].status;
+      return settings[PROVIDERS[p].keyField] && (st === 'checking' || st === 'none');
+    });
+    const chosen = usable[0] || unverified[0] || '';
+    if(chosen){ engineState.llm = chosen; engineState.llmModel = providerModel(chosen); }
+    else { engineState.llm='none'; engineState.llmModel=''; }
+  }
   engineState.checked = true;
   return engineState.llm;
 }
@@ -3343,15 +3484,15 @@ async function generateText(system, user, opts, onDelta, onStage){
   }
   if(engine === 'openai'){
     onStage('Writing with OpenAI…', 55);
-    return { text: await openaiChat(system, user, opts, onDelta), model: settings.modelOpenai };
+    return { text: await openaiChat(system, user, opts, onDelta), model: providerModel('openai') };
   }
   if(engine === 'anthropic'){
     onStage('Writing with Claude…', 55);
-    return { text: await anthropicChat(system, user, opts, onDelta), model: settings.modelAnthropic };
+    return { text: await anthropicChat(system, user, opts, onDelta), model: providerModel('anthropic') };
   }
   if(engine === 'gemini'){
     onStage('Writing with Gemini…', 55);
-    return { text: await geminiChat(system, user, opts, onDelta), model: settings.modelGemini };
+    return { text: await geminiChat(system, user, opts, onDelta), model: providerModel('gemini') };
   }
   onStage('Building outline…', 55);
   return { text: extractiveNotes(user), model:'built-in outline (no AI)' };
@@ -4068,8 +4209,8 @@ function clearError(){ show($('#errorBox'), false); }
 function engineLabel(){
   const asr = resolvedAsrEngine();
   let asrName;
-  if(asr === 'openai') asrName = 'OpenAI '+(settings.modelOpenaiAsr||'whisper-1');
-  else if(asr === 'gemini') asrName = 'Gemini';
+  if(asr === 'openai') asrName = 'OpenAI · '+(providerAsrModel('openai')||'whisper-1');
+  else if(asr === 'gemini') asrName = 'Gemini · '+(providerModel('gemini')||'gemini');
   else if(asr === 'webspeech') asrName = 'Browser speech';
   else asrName = resolvedAsrModel().name;
 
@@ -4077,6 +4218,11 @@ function engineLabel(){
   let llmName = llmMap[engineState.llm] || '…';
   if(engineState.llm === 'ollama' && engineState.llmModel) llmName = 'Ollama · '+engineState.llmModel;
   if(engineState.llm === 'webllm' && webllm.modelId) llmName = 'WebLLM · '+webllm.modelId.replace(/-MLC$/,'');
+  // cloud providers name the exact model too, since it is now chosen for you
+  if(PROVIDERS[engineState.llm]){
+    const m = providerModel(engineState.llm);
+    if(m) llmName = llmMap[engineState.llm]+' · '+m;
+  }
   return { asr: asrName, llm: llmName };
 }
 /* --------------------------- hosting-environment notices --------------------------- */
@@ -4193,8 +4339,8 @@ function renderEngineBar(){
   const sum = $('#engineSummary');
   if(sum){
     sum.textContent = (local && localLlm)
-      ? 'Running on this device: '+l.asr+' for speech, '+l.llm+' for notes'
-      : l.asr+' for speech, '+l.llm+' for notes';
+      ? 'On this device: '+l.asr+' \u00b7 '+l.llm
+      : l.asr+' \u00b7 '+l.llm;
   }
 }
 
@@ -4712,12 +4858,55 @@ function updateAsrHint(){
         ? ' Opened from a folder, this size often fails to allocate — serve over http:// first.' : ''))
     : '';
 }
+const PROVIDER_DOT = { none:'', checking:'busy', ok:'ok', empty:'warn', invalid:'err', error:'err' };
+function providerStatusLine(id){
+  const st = providerState[id], meta = PROVIDERS[id];
+  const pinned = (settings[meta.modelField]||'').trim();
+  switch(st.status){
+    case 'none':     return 'No key saved';
+    case 'checking': return 'Checking key and fetching models…';
+    case 'invalid':  return 'That key was rejected — ' + st.error;
+    case 'error':    return 'Could not reach ' + meta.label + ' — ' + st.error;
+    case 'empty':    return 'Key works, but no usable models were returned';
+    default:
+      return 'Key valid · ' + st.chat.length + ' model' + (st.chat.length===1?'':'s') + ' available · using ' +
+        (pinned ? pinned + ' (pinned)' : (st.pick || 'none') + ' (chosen automatically)');
+  }
+}
 function updateKeyStatus(){
-  [['openai','keyOpenai'],['anthropic','keyAnthropic'],['gemini','keyGemini']].forEach(function(p){
-    const has = !!$('#'+p[1]).value.trim();
-    $('#'+p[0]+'Dot').className = 'status-dot '+(has ? 'ok' : '');
-    $('#'+p[0]+'Status').textContent = has ? 'Key saved on this device' : 'No key saved';
+  Object.keys(PROVIDERS).forEach(function(id){
+    const st = providerState[id];
+    const dot = $('#'+id+'Dot'), line = $('#'+id+'Status');
+    if(dot) dot.className = 'status-dot '+(PROVIDER_DOT[st.status]||'');
+    if(line) line.textContent = providerStatusLine(id);
+    fillProviderList(id);
   });
+  renderKeySummary();
+}
+function fillProviderList(id){
+  const lists = { openai:'#listOpenai', anthropic:'#listAnthropic', gemini:'#listGemini' };
+  const el = $(lists[id]);
+  if(el) el.innerHTML = providerState[id].chat.map(function(m){ return '<option value="'+esc(m)+'"></option>'; }).join('');
+  if(id === 'openai'){
+    const a = $('#listOpenaiAsr');
+    if(a) a.innerHTML = providerState.openai.asr.map(function(m){ return '<option value="'+esc(m)+'"></option>'; }).join('');
+  }
+}
+function renderKeySummary(){
+  const host = $('#keySummary');
+  if(!host) return;
+  const rows = Object.keys(PROVIDERS).map(function(id){
+    const st = providerState[id], meta = PROVIDERS[id];
+    const label = { none:'No key', checking:'Checking…', ok:'Ready', empty:'No models',
+                    invalid:'Key rejected', error:'Unreachable' }[st.status] || '';
+    const model = st.status === 'ok' ? ((settings[meta.modelField]||'').trim() || st.pick) : '';
+    return '<div class="key-row"><span class="status-dot '+(PROVIDER_DOT[st.status]||'')+'"></span>'+
+      '<b>'+esc(meta.label)+'</b><span class="key-state">'+esc(label)+'</span>'+
+      (model ? '<span class="key-model" title="'+esc(model)+'">'+esc(model)+'</span>' : '')+'</div>';
+  }).join('');
+  host.innerHTML = rows +
+    '<button class="btn xs btn-ghost" data-act="recheckAll"><span data-icon="refresh"></span> Recheck all</button>';
+  paintIcons(host);
 }
 async function updateOllamaSelect(){
   const dot = $('#ollamaDot'), st = $('#ollamaStatus');
@@ -4938,9 +5127,14 @@ const ACTIONS = {
     closeModal($('#settingsModal'));
   },
   async testOllama(){ settings.ollamaUrl = $('#ollamaUrl').value.trim() || DEFAULT_SETTINGS.ollamaUrl; await updateOllamaSelect(); },
-  async fetchOpenai(){ await loadModelList('#modelOpenai','#listOpenai', fetchOpenAIModels, 'openai'); },
-  async fetchAnthropic(){ await loadModelList('#modelAnthropic','#listAnthropic', fetchAnthropicModels, 'anthropic'); },
-  async fetchGemini(){ await loadModelList('#modelGemini','#listGemini', fetchGeminiModels, 'gemini'); },
+  async fetchOpenai(){ await recheckProvider('openai'); },
+  async fetchAnthropic(){ await recheckProvider('anthropic'); },
+  async fetchGemini(){ await recheckProvider('gemini'); },
+  async recheckAll(){
+    readSettingsForm();
+    await refreshProviders(function(){ updateKeyStatus(); });
+    renderEngineBar();
+  },
   async loadWebllmList(){
     const dot = $('#webllmDot'), st = $('#webllmStatus');
     dot.className='status-dot busy'; st.textContent='Fetching model list…';
@@ -5047,20 +5241,14 @@ const ACTIONS = {
     resolveLlmEngine(true).then(renderEngineBar);
   }
 };
-async function loadModelList(inputSel, listSel, fetcher, who){
-  const dot = $('#'+who+'Dot'), st = $('#'+who+'Status');
+async function recheckProvider(id){
   readSettingsForm();
-  dot.className='status-dot busy'; st.textContent='Fetching models…';
-  try{
-    const ids = await fetcher();
-    $(listSel).innerHTML = ids.map(function(id){ return '<option value="'+esc(id)+'"></option>'; }).join('');
-    dot.className='status-dot ok';
-    st.textContent = ids.length+' models available — start typing in the box to pick one';
-    if(ids.length && !ids.indexOf($(inputSel).value.trim())){ /* keep current */ }
-  }catch(e){
-    dot.className='status-dot err';
-    st.textContent = e.message;
-  }
+  providerState[id].status = settings[PROVIDERS[id].keyField] ? 'checking' : 'none';
+  updateKeyStatus();
+  await refreshProvider(id);
+  updateKeyStatus();
+  await resolveLlmEngine(true);
+  renderEngineBar();
 }
 
 function wireEvents(){
@@ -5192,6 +5380,13 @@ async function init(){
   setTab(env.micPolicy === 'blocked' ? 'upload' : 'record');
   wireEvents();
   wireViewport();
+  // Verify keys and pull each provider's current model list in the background.
+  refreshProviders(function(){
+    if($('#settingsModal') && !$('#settingsModal').hidden) updateKeyStatus();
+  }).then(function(){
+    updateKeyStatus();
+    return resolveLlmEngine(true);
+  }).then(renderEngineBar).catch(function(){});
   frameBridge.init();
   wireDrop('#audioDrop','#audioInput', handleAudioFile);
   wireDrop('#pdfDrop','#pdfInput', handlePdfFile);
